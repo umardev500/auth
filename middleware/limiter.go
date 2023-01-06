@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"auth/domain"
 	"net/http"
 	"os"
 	"strconv"
@@ -30,7 +31,11 @@ func RateLimiter(storage fiber.Storage) (f func(ctx *fiber.Ctx) error) {
 				return c.Get("userid")
 			},
 			LimitReached: func(c *fiber.Ctx) error {
-				return c.JSON(http.StatusText(http.StatusTooManyRequests))
+				response := domain.BasicResponse{
+					StatusCode: http.StatusTooManyRequests,
+					Message:    http.StatusText(http.StatusTooManyRequests),
+				}
+				return c.JSON(response)
 			},
 			Storage: storage,
 		})(ctx)
