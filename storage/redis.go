@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v9"
@@ -23,53 +22,78 @@ func NewRedisStorage(client *redis.Client) fiber.Storage {
 	}
 }
 
-func (r *RedisStorage) Set(key string, val []byte, exp time.Duration) error {
-	if len(key) == 0 || len(val) == 0 {
-		return nil
+func (r *RedisStorage) withTimeout(dur int, f func(context.Context)) {
+	if dur == 0 {
+		dur = 10 // set default timeout duration to 10 seconds
 	}
-
-	if exp > 0 {
-		return r.client.Set(r.ctx, key, val, exp).Err()
-	}
-
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(dur)*time.Second)
+	defer cancel()
+	f(ctx)
 }
 
-func (r *RedisStorage) Get(key string) ([]byte, error) {
-	fmt.Println("getter")
-	val, err := r.client.Get(r.ctx, key).Bytes()
-	if err == redis.Nil {
-		return nil, nil
-	}
-
-	if err != nil {
-		fmt.Println("disini", err)
-		return nil, err
-	}
-
-	return val, nil
-}
-
-func (r *RedisStorage) Delete(key string) error {
-	return r.client.Del(r.ctx, key).Err()
-}
-
-func (r *RedisStorage) Reset() error {
-	keys, err := r.client.Keys(r.ctx, "*").Result()
-	if err != nil {
-		return err
-	}
-
-	if len(keys) > 0 {
-		_, err := r.client.Del(r.ctx, keys...).Result()
-		if err != nil {
-			return err
+func (r *RedisStorage) Set(key string, val []byte, exp time.Duration) (err error) {
+	r.withTimeout(0, func(ctx context.Context) {
+		if len(key) == 0 || len(val) == 0 {
+			return
 		}
-	}
+
+		if exp > 0 {
+			err = r.client.Set(ctx, key, val, exp).Err()
+			return
+		}
+	})
+
+	return
+}
+
+func (r *RedisStorage) Get(key string) (val []byte, err error) {
+
+	r.withTimeout(0, func(ctx context.Context) {
+		val, err = r.client.Get(ctx, key).Bytes()
+		if err == redis.Nil {
+			val = nil
+			err = nil
+		}
+
+		if err != nil {
+			val = nil
+		}
+	})
+
+	return
+}
+
+func (r *RedisStorage) Delete(key string) (err error) {
+	r.withTimeout(0, func(ctx context.Context) {
+		err = r.client.Del(ctx, key).Err()
+	})
+
+	return
+}
+
+func (r *RedisStorage) Reset() (err error) {
+	r.withTimeout(0, func(ctx context.Context) {
+		keys, err := r.client.Keys(r.ctx, "*").Result()
+		if err != nil {
+			return
+		}
+
+		if len(keys) > 0 {
+			_, err = r.client.Del(r.ctx, keys...).Result()
+			if err != nil {
+				return
+			}
+		}
+
+	})
 
 	return nil
 }
 
-func (r *RedisStorage) Close() error {
-	return r.client.Close()
+func (r *RedisStorage) Close() (err error) {
+	r.withTimeout(0, func(ctx context.Context) {
+		err = r.client.Close()
+	})
+
+	return
 }
