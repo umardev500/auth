@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -24,6 +26,13 @@ func RateLimiter(storage fiber.Storage) (f func(ctx *fiber.Ctx) error) {
 		},
 		Storage: storage,
 	})
+
+	f = func(ctx *fiber.Ctx) error {
+		userId := ctx.Get("userid")
+		fmt.Println(userId)
+
+		return errors.New(userId)
+	}
 
 	return
 }
