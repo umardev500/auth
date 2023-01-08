@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"auth/domain"
+	"auth/middleware"
 	"net/http"
 	"os"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -19,13 +19,9 @@ var validate = validator.New()
 
 func NewAdminDelivery(router fiber.Router) {
 	handler := &adminDelivery{}
-	router.Post("/admin", handler.Login)
 
-	secret := os.Getenv("SECRET")
-	router.Use(jwtware.New(jwtware.Config{
-		SigningKey: []byte(secret),
-	}))
-	router.Get("/admin", handler.Auth)
+	router.Post("/admin", handler.Login)
+	router.Get("/admin", middleware.JwtMiddleware(), handler.Auth)
 }
 
 func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, message string, token *string) error {
