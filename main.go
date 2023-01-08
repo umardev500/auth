@@ -17,8 +17,9 @@ func main() {
 
 	port := os.Getenv("PORT")
 	app := fiber.New()
-	injector.NewAdminInjector(app)
 	injector.NewAuthInjector(app)
+	// some routes use jwt here
+	injector.NewAdminInjector(app)
 
 	fmt.Printf("⚡️[server]: Server is running on port %s\n", port)
 	log.Fatal(app.Listen(port))

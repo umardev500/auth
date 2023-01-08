@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -17,8 +18,13 @@ var validate = validator.New()
 
 func NewAdminDelivery(router fiber.Router) {
 	handler := &adminDelivery{}
-	router.Get("/admin", handler.Auth)
 	router.Post("/admin", handler.Login)
+
+	secret := os.Getenv("SECRET")
+	router.Use(jwtware.New(jwtware.Config{
+		SigningKey: []byte(secret),
+	}))
+	router.Get("/admin", handler.Auth)
 }
 
 func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, message string, token *string) error {
@@ -52,7 +58,7 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 	secret := os.Getenv("SECRET")
 	claims := jwt.MapClaims{
 		"name": "jack",
-		"exp":  time.Now().UTC().Add(1 * time.Hour).Unix(),
+		"exp":  time.Now().Add(1 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
