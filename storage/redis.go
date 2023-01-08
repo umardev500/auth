@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v9"
@@ -13,9 +14,11 @@ type RedisStorage struct {
 	client *redis.Client
 }
 
-func NewRedisStorage(ctx context.Context, client *redis.Client) fiber.Storage {
+func NewRedisStorage(client *redis.Client) fiber.Storage {
+	cont := context.Background()
+
 	return &RedisStorage{
-		ctx:    ctx,
+		ctx:    cont,
 		client: client,
 	}
 }
@@ -33,11 +36,14 @@ func (r *RedisStorage) Set(key string, val []byte, exp time.Duration) error {
 }
 
 func (r *RedisStorage) Get(key string) ([]byte, error) {
+	fmt.Println("getter")
 	val, err := r.client.Get(r.ctx, key).Bytes()
 	if err == redis.Nil {
 		return nil, nil
 	}
+
 	if err != nil {
+		fmt.Println("disini", err)
 		return nil, err
 	}
 
