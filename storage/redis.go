@@ -47,7 +47,6 @@ func (r *RedisStorage) Set(key string, val []byte, exp time.Duration) (err error
 }
 
 func (r *RedisStorage) Get(key string) (val []byte, err error) {
-
 	r.withTimeout(0, func(ctx context.Context) {
 		val, err = r.client.Get(ctx, key).Bytes()
 		if err == redis.Nil {
