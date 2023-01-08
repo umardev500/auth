@@ -72,8 +72,5 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 }
 
 func (a *adminDelivery) Auth(ctx *fiber.Ctx) error {
-	// token := ctx.GetReqHeaders()
-	// fmt.Println(token)
-
-	return ctx.Status(http.StatusUnauthorized).JSON(http.StatusText(http.StatusUnauthorized))
+	return ctx.JSON("OK")
 }
