@@ -17,10 +17,10 @@ type adminDelivery struct{}
 
 var validate = validator.New()
 
-func NewAdminDelivery(router fiber.Router) {
+func NewAdminDelivery(router fiber.Router, storage fiber.Storage) {
 	handler := &adminDelivery{}
 
-	router.Post("/admin", handler.Login)
+	router.Post("/admin", middleware.RateLimiter(storage), handler.Login)
 	router.Get("/admin", middleware.JwtMiddleware(), handler.Auth)
 }
 

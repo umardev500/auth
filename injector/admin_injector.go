@@ -7,5 +7,6 @@ import (
 )
 
 func NewAdminInjector(router fiber.Router) {
-	delivery.NewAdminDelivery(router)
+	strg := NewRedisInjector()
+	delivery.NewAdminDelivery(router, strg)
 }
