@@ -17,7 +17,7 @@ func RateLimiter(storage fiber.Storage) (f func(ctx *fiber.Ctx) error) {
 		Max:        1,
 		Expiration: 1 * time.Minute,
 		KeyGenerator: func(c *fiber.Ctx) string {
-			return c.Get("Userid")
+			return c.Get("userid")
 		},
 		LimitReached: func(c *fiber.Ctx) error {
 			return c.JSON(http.StatusText(http.StatusTooManyRequests))
