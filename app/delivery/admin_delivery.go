@@ -4,6 +4,7 @@ import (
 	"auth/domain"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -56,9 +57,10 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 	}
 
 	secret := os.Getenv("SECRET")
+	hours, _ := strconv.Atoi(os.Getenv("EXPIRED_HOURS"))
 	claims := jwt.MapClaims{
 		"name": "jack",
-		"exp":  time.Now().Add(1 * time.Hour).Unix(),
+		"exp":  time.Now().Add(time.Duration(hours) * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
