@@ -37,6 +37,7 @@ func RateLimiter(storage fiber.Storage) (f func(ctx *fiber.Ctx) error) {
 					Message:    http.StatusText(http.StatusTooManyRequests),
 				}
 				return c.JSON(response)
+
 			},
 			Storage: storage,
 		})(ctx)
