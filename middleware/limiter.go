@@ -20,7 +20,7 @@ func RateLimiter(storage fiber.Storage) (f func(ctx *fiber.Ctx) error) {
 		}
 
 		maxReq, _ := strconv.Atoi(os.Getenv("LOGIN_MAX_REQ"))
-		expiredTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRED_TIME"))
+		expiredTime, _ := strconv.Atoi(os.Getenv("LOGIN_LIMITER_EXPIRATION_TIME"))
 
 		return limiter.New(limiter.Config{
 			Next: func(c *fiber.Ctx) bool {

@@ -53,10 +53,10 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 	}
 
 	secret := os.Getenv("SECRET")
-	hours, _ := strconv.Atoi(os.Getenv("EXPIRED_HOURS"))
+	expirationTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRATION_TIME"))
 	claims := jwt.MapClaims{
 		"name": "jack",
-		"exp":  time.Now().Add(time.Duration(hours) * time.Hour).Unix(),
+		"exp":  time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
