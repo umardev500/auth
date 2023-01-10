@@ -18,7 +18,10 @@ func main() {
 
 	port := os.Getenv("PORT")
 	app := fiber.New()
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+	}))
+
 	injector.NewAuthInjector(app)
 	// some routes use jwt here
 	injector.NewAdminInjector(app)

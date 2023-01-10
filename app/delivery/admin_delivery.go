@@ -35,6 +35,17 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 		Message:    message,
 		Token:      tokenValue,
 	}
+
+	expired, _ := strconv.Atoi(os.Getenv("COOKIE_EXPIRATION_TIME"))
+
+	ctx.Cookie(&fiber.Cookie{
+		Path:     "/",
+		Name:     "token",
+		Value:    *token,
+		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Duration(expired) * time.Second),
+	})
+
 	return ctx.JSON(response)
 }
 
