@@ -9,10 +9,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
-func RateLimiter(storage fiber.Storage, max, expires int64) (f func(ctx *fiber.Ctx) error) {
+func RateLimiter(header string, storage fiber.Storage, max, expires int64) (f func(ctx *fiber.Ctx) error) {
 	f = func(ctx *fiber.Ctx) error {
 
-		userId := ctx.Get("userid")
+		userId := ctx.Get(header)
 		if userId == "" {
 			return ctx.Status(http.StatusBadRequest).JSON(http.StatusText(http.StatusBadRequest))
 		}
@@ -24,7 +24,7 @@ func RateLimiter(storage fiber.Storage, max, expires int64) (f func(ctx *fiber.C
 			Max:        int(max),
 			Expiration: time.Duration(expires) * time.Second,
 			KeyGenerator: func(c *fiber.Ctx) string {
-				return c.Get("userid")
+				return c.Get(header)
 			},
 			LimitReached: func(c *fiber.Ctx) error {
 				response := domain.BasicResponse{
