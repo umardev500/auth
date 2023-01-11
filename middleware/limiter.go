@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
-func RateLimiter(header string, storage fiber.Storage, max, expires int64) (f func(ctx *fiber.Ctx) error) {
+func RateLimiter(header, skipIp string, storage fiber.Storage, max, expires int64) (f func(ctx *fiber.Ctx) error) {
 	f = func(ctx *fiber.Ctx) error {
 
 		userId := ctx.Get(header)
