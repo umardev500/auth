@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"auth/domain"
+	"auth/helper"
 	"auth/middleware"
 	"net/http"
 	"os"
@@ -49,6 +50,19 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 	return ctx.JSON(response)
 }
 
+func (a *adminDelivery) createJWT() (token string, err error) {
+	secret := os.Getenv("SECRET")
+	expirationTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRATION_TIME"))
+	claims := jwt.MapClaims{
+		"name": "jack",
+		"exp":  time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
+	}
+
+	token, err = helper.CreateJWT(secret, claims)
+
+	return
+}
+
 func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 	var req domain.LoginRequest
 	if err := ctx.BodyParser(&req); err != nil {
@@ -63,17 +77,9 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 		return a.sendLoginResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 	}
 
-	secret := os.Getenv("SECRET")
-	expirationTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRATION_TIME"))
-	claims := jwt.MapClaims{
-		"name": "jack",
-		"exp":  time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(secret))
+	signedToken, err := a.createJWT()
 	if err != nil {
-		return a.sendLoginResponse(ctx, http.StatusOK, err.Error(), nil)
+		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	response := a.sendLoginResponse(ctx, http.StatusOK, "Get token", &signedToken)
