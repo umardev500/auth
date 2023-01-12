@@ -1,6 +1,7 @@
 package main
 
 import (
+	"auth/config"
 	"auth/injector"
 	"fmt"
 	"log"
@@ -16,6 +17,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	conns := config.NewConn()
+	user := conns.UserConn()
+
 	port := os.Getenv("PORT")
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
@@ -24,7 +28,7 @@ func main() {
 
 	injector.NewAuthInjector(app)
 	// some routes use jwt here
-	injector.NewAdminInjector(app)
+	injector.NewAdminInjector(app, user)
 
 	fmt.Printf("⚡️[server]: Server is running on port %s\n", port)
 	log.Fatal(app.Listen(port))

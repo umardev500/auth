@@ -4,6 +4,7 @@ import (
 	"auth/domain"
 	"auth/helper"
 	"auth/middleware"
+	"auth/pb"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,12 +15,16 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type adminDelivery struct{}
+type adminDelivery struct {
+	usecase domain.AdminUsecase
+}
 
 var validate = validator.New()
 
-func NewAdminDelivery(router fiber.Router, storage fiber.Storage) {
-	handler := &adminDelivery{}
+func NewAdminDelivery(router fiber.Router, storage fiber.Storage, usecase domain.AdminUsecase) {
+	handler := &adminDelivery{
+		usecase: usecase,
+	}
 
 	loginMaxRate, _ := strconv.Atoi(os.Getenv("LOGIN_MAX_REQ"))
 	loginExpiresRate, _ := strconv.Atoi(os.Getenv("LOGIN_LIMITER_EXPIRATION_TIME"))
@@ -41,13 +46,15 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 
 	expired, _ := strconv.Atoi(os.Getenv("COOKIE_EXPIRATION_TIME"))
 
-	ctx.Cookie(&fiber.Cookie{
-		Path:     "/",
-		Name:     "token",
-		Value:    *token,
-		HTTPOnly: true,
-		Expires:  time.Now().Add(time.Duration(expired) * time.Second),
-	})
+	if token != nil {
+		ctx.Cookie(&fiber.Cookie{
+			Path:     "/",
+			Name:     "token",
+			Value:    tokenValue,
+			HTTPOnly: true,
+			Expires:  time.Now().Add(time.Duration(expired) * time.Second),
+		})
+	}
 
 	return ctx.JSON(response)
 }
@@ -77,6 +84,19 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 
 	if err := validate.Struct(&req); err != nil {
 		return a.sendLoginResponse(ctx, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	// login
+	reqContext := ctx.Context()
+	payload := &pb.UserLoginRequest{
+		User: req.Username,
+		Pass: req.Password,
+	}
+
+	_, err := a.usecase.Login(reqContext, payload)
+	if err != nil {
+
+		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	signedToken, err := a.createJWT()
