@@ -7,7 +7,9 @@ message UserLoginRequest {
     string pass = 2;
 }
 
-message UserLoginResponse {}
+message UserLoginResponse {
+    bool is_exist = 1;
+}
 
 service UserService {
     rpc Login(UserLoginRequest) returns (UserLoginResponse) {}

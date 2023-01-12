@@ -93,10 +93,13 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 		Pass: req.Password,
 	}
 
-	_, err := a.usecase.Login(reqContext, payload)
+	resp, err := a.usecase.Login(reqContext, payload)
 	if err != nil {
-
 		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	if !resp.IsExist {
+		return a.sendLoginResponse(ctx, http.StatusNotFound, "Account not found", nil)
 	}
 
 	signedToken, err := a.createJWT()
