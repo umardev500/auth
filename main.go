@@ -24,6 +24,7 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
+		ExposeHeaders:    "Retry-After",
 	}))
 
 	injector.NewAuthInjector(app)
