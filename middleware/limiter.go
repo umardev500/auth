@@ -12,8 +12,8 @@ import (
 func RateLimiter(header, skipIp string, storage fiber.Storage, max, expires int64) (f func(ctx *fiber.Ctx) error) {
 	f = func(ctx *fiber.Ctx) error {
 
-		userId := ctx.Get(header)
-		if userId == "" {
+		pageId := ctx.Get(header)
+		if pageId == "" {
 			return ctx.Status(http.StatusBadRequest).JSON(http.StatusText(http.StatusBadRequest))
 		}
 
