@@ -8,7 +8,9 @@ message UserLoginRequest {
 }
 
 message UserLoginResponse {
-    bool is_exist = 1;
+    string user_id = 1;
+    string user = 2;
+    string level = 3;
 }
 
 service UserService {

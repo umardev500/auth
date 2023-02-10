@@ -60,12 +60,14 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 	return ctx.JSON(response)
 }
 
-func (a *adminDelivery) createJWT() (token string, err error) {
+func (a *adminDelivery) createJWT(payload *pb.UserLoginResponse) (token string, err error) {
 	secret := os.Getenv("SECRET")
 	expirationTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRATION_TIME"))
 	claims := jwt.MapClaims{
-		"name": "jack",
-		"exp":  time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
+		"user_id": payload.UserId,
+		"user":    payload.User,
+		"level":   payload.Level,
+		"exp":     time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
 	}
 
 	token, err = helper.CreateJWT(secret, claims)
@@ -99,11 +101,11 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
-	if !resp.IsExist {
+	if resp == nil {
 		return a.sendLoginResponse(ctx, http.StatusNotFound, "Account not found", nil)
 	}
 
-	signedToken, err := a.createJWT()
+	signedToken, err := a.createJWT(resp)
 	if err != nil {
 		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
