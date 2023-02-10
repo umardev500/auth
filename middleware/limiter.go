@@ -19,7 +19,7 @@ func RateLimiter(header, skipIp string, storage fiber.Storage, max, expires int6
 
 		return limiter.New(limiter.Config{
 			Next: func(c *fiber.Ctx) bool {
-				return c.IP() == "500.0.0.1"
+				return c.IP() == skipIp
 			},
 			Max:        int(max),
 			Expiration: time.Duration(expires) * time.Second,
