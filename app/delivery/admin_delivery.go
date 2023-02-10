@@ -110,7 +110,7 @@ func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 		return a.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
-	response := a.sendLoginResponse(ctx, http.StatusOK, "Get token", &signedToken)
+	response := a.sendLoginResponse(ctx, http.StatusOK, "Login", &signedToken)
 	return response
 }
 
