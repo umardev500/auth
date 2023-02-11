@@ -28,7 +28,7 @@ func NewAdminDelivery(router fiber.Router, storage fiber.Storage, usecase domain
 
 	loginMaxRate, _ := strconv.Atoi(os.Getenv("LOGIN_MAX_REQ"))
 	loginExpiresRate, _ := strconv.Atoi(os.Getenv("LOGIN_LIMITER_EXPIRATION_TIME"))
-	limiter := middleware.RateLimiter("page_id", "192.199.9.8", storage, int64(loginMaxRate), int64(loginExpiresRate))
+	limiter := middleware.RateLimiter("page-id", "192.199.9.8", storage, int64(loginMaxRate), int64(loginExpiresRate))
 	router.Post("/admin", limiter, handler.Login)
 	router.Get("/admin", middleware.JwtMiddleware(), handler.Auth)
 }
