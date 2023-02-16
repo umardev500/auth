@@ -33,8 +33,9 @@ func main() {
 	injector.NewAdminInjector(app, user)
 
 	// customer
-	api := app.Group("api")
-	injector.NewCustomerInjector(api, customer)
+	customerRoute := app.Group("customer")
+	customerApi := customerRoute.Group("api")
+	injector.NewCustomerInjector(customerApi, customer)
 
 	fmt.Printf("⚡️[server]: Server is running on port %s\n", port)
 	log.Fatal(app.Listen(port))
