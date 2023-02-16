@@ -1,11 +1,19 @@
 package delivery
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"auth/domain"
 
-type customerDelivery struct{}
+	"github.com/gofiber/fiber/v2"
+)
 
-func NewCustomerDeliery(router fiber.Router) {
-	handler := &customerDelivery{}
+type customerDelivery struct {
+	usecase domain.CustomerUsecase
+}
+
+func NewCustomerDeliery(router fiber.Router, usecase domain.CustomerUsecase) {
+	handler := &customerDelivery{
+		usecase: usecase,
+	}
 	router.Post("/login", handler.Login)
 }
 
