@@ -19,6 +19,7 @@ func main() {
 
 	conns := config.NewConn()
 	user := conns.UserConn()
+	customer := conns.CustomerConn()
 
 	port := os.Getenv("PORT")
 	app := fiber.New()
@@ -30,6 +31,10 @@ func main() {
 	injector.NewAuthInjector(app)
 	// some routes use jwt here
 	injector.NewAdminInjector(app, user)
+
+	// customer
+	api := app.Group("api")
+	injector.NewCustomerInjector(api, customer)
 
 	fmt.Printf("⚡️[server]: Server is running on port %s\n", port)
 	log.Fatal(app.Listen(port))
