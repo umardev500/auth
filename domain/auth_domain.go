@@ -5,11 +5,21 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
+type LoginResponseData struct {
+	UserId string `json:"user_id,omitempty"`
+	User   string `json:"user,omitempty"`
+}
+
+type LoginResponse struct {
+	IsEmpty bool              `json:"is_empty"`
+	Payload LoginResponseData `json:"payload"`
+}
+
 type Options struct {
 	Token string `json:"token,omitempty"`
 }
 
-type LoginResponse struct {
+type LoginResponsePayload struct {
 	StatusCode int    `json:"status_code"`
 	Message    string `json:"message,omitempty"`
 	Token      string `json:"token,omitempty"`

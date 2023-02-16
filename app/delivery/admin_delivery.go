@@ -39,7 +39,7 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 		tokenValue = *token
 	}
 
-	response := domain.LoginResponse{
+	response := domain.LoginResponsePayload{
 		StatusCode: statusCode,
 		Message:    message,
 		Token:      tokenValue,
@@ -78,7 +78,7 @@ func (a *adminDelivery) createJWT(data *pb.UserLoginResponse) (token string, err
 func (a *adminDelivery) Login(ctx *fiber.Ctx) error {
 	var req domain.LoginRequest
 	if err := ctx.BodyParser(&req); err != nil {
-		response := domain.LoginResponse{
+		response := domain.LoginResponsePayload{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		}
