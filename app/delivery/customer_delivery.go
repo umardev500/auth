@@ -26,6 +26,7 @@ func NewCustomerDeliery(router fiber.Router, storage fiber.Storage, usecase doma
 	loginExpiresRate, _ := strconv.Atoi(os.Getenv("LOGIN_LIMITER_EXPIRATION_TIME"))
 	limiter := middleware.RateLimiter("page-id", "192.199.9.8", storage, int64(loginMaxRate), int64(loginExpiresRate))
 	router.Post("/login", limiter, handler.Login)
+	router.Get("/auth", middleware.JwtMiddleware(), handler.Auth)
 }
 
 func (c *customerDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, message string, token *string) error {
@@ -91,4 +92,8 @@ func (c *customerDelivery) Login(ctx *fiber.Ctx) error {
 	}
 
 	return c.sendLoginResponse(ctx, http.StatusOK, "Login customer", &token)
+}
+
+func (c *customerDelivery) Auth(ctx *fiber.Ctx) error {
+	return ctx.JSON("OK")
 }
