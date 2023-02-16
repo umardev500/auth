@@ -12,5 +12,6 @@ import (
 func NewCustomerInjector(router fiber.Router, customer pb.CustomerServiceClient) {
 	repo := repository.NewCustomerRepository(customer)
 	uc := usecase.NewCustomerUsecase(repo)
-	delivery.NewCustomerDeliery(router, uc)
+	strg := NewRedisInjector()
+	delivery.NewCustomerDeliery(router, strg, uc)
 }

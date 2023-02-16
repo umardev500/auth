@@ -3,6 +3,7 @@ package delivery
 import (
 	"auth/domain"
 	"auth/helper"
+	"auth/middleware"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,11 +18,14 @@ type customerDelivery struct {
 	usecase domain.CustomerUsecase
 }
 
-func NewCustomerDeliery(router fiber.Router, usecase domain.CustomerUsecase) {
+func NewCustomerDeliery(router fiber.Router, storage fiber.Storage, usecase domain.CustomerUsecase) {
 	handler := &customerDelivery{
 		usecase: usecase,
 	}
-	router.Post("/login", handler.Login)
+	loginMaxRate, _ := strconv.Atoi(os.Getenv("LOGIN_MAX_REQ"))
+	loginExpiresRate, _ := strconv.Atoi(os.Getenv("LOGIN_LIMITER_EXPIRATION_TIME"))
+	limiter := middleware.RateLimiter("page-id", "192.199.9.8", storage, int64(loginMaxRate), int64(loginExpiresRate))
+	router.Post("/login", limiter, handler.Login)
 }
 
 func (c *customerDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, message string, token *string) error {
@@ -50,6 +54,7 @@ func (c *customerDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, mes
 
 	return ctx.JSON(response)
 }
+
 func (c *customerDelivery) createJWT(data domain.LoginResponseData) (token string, err error) {
 	secret := os.Getenv("SECRET")
 	expirationTime, _ := strconv.Atoi(os.Getenv("LOGIN_EXPIRATION_TIME"))
