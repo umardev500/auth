@@ -4,7 +4,6 @@ import (
 	"auth/domain"
 	"auth/helper"
 	"auth/middleware"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -73,7 +72,7 @@ func (c *customerDelivery) Login(ctx *fiber.Ctx) error {
 
 	var payload domain.LoginRequest
 	if err := ctx.BodyParser(&payload); err != nil {
-		fmt.Println(err)
+		return c.sendLoginResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	reqCtx := ctx.Context()
