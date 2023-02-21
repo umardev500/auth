@@ -8,6 +8,7 @@ type LoginRequest struct {
 type LoginResponseData struct {
 	UserId string `json:"user_id,omitempty"`
 	User   string `json:"user,omitempty"`
+	Name   string `json:"name,omitempty"`
 }
 
 type LoginResponse struct {

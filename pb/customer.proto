@@ -21,7 +21,8 @@ message CustomerDetail {
     string type = 5;
     string level = 6;
     string about = 7;
-    CustomerLocation location = 8;
+    string logo = 8;
+    CustomerLocation location = 9;
 }
 
 message CustomerCreateRequest {
@@ -42,10 +43,13 @@ message Customer {
     int64 deleted_at = 9;
 }
 
-message CustomerFindOneRequest {
+message CustomerFindRequest {
     string customer_id = 1;
-    string user = 2;
-    string pass = 3;
+}
+
+message CustomerFindResponse {
+    bool is_empty = 1;
+    Customer payload = 2;
 }
 
 message CustomerFindAllRequest {
@@ -96,6 +100,7 @@ message CustomerLoginRequest {
 message CustomerLoginPayload {
     string customer_id = 1;
     string user = 2;
+    string name = 3;
 }
 
 message CustomerLoginResponse {
@@ -103,12 +108,19 @@ message CustomerLoginResponse {
     CustomerLoginPayload payload = 2;
 }
 
+message CustomerUpdateCredsRequest {
+    string user = 1;
+    string pass = 2;
+    string new_pass = 3;
+}
+
 service CustomerService {
     rpc Create(CustomerCreateRequest) returns (Empty) {}
-    rpc FindOne(CustomerFindOneRequest) returns (Customer) {}
+    rpc Find(CustomerFindRequest) returns (CustomerFindResponse) {}
     rpc FindAll(CustomerFindAllRequest) returns (CustomerFindAllResponse) {}
     rpc ChangeStatus(CustomerChangeStatusRequest) returns (OperationResponse) {}
     rpc UpdateDetail(CustomerUpdateDetailRequest) returns (OperationResponse) {}
+    rpc UpdateCreds(CustomerUpdateCredsRequest) returns (OperationResponse) {}
     rpc Delete(CustomerDeleteRequest) returns (OperationResponse) {}
     rpc SetExp(CustomerSetExpRequest) returns (OperationResponse) {}
     rpc Login(CustomerLoginRequest) returns (CustomerLoginResponse) {}

@@ -61,6 +61,7 @@ func (c *customerDelivery) createJWT(data domain.LoginResponseData) (token strin
 	claims := jwt.MapClaims{
 		"user_id": data.UserId,
 		"user":    data.User,
+		"name":    data.Name,
 		"exp":     time.Now().Add(time.Duration(expirationTime) * time.Second).Unix(),
 	}
 

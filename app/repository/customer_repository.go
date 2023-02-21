@@ -32,6 +32,7 @@ func (c *customerRepository) Login(ctx context.Context, req *pb.CustomerLoginReq
 		Payload: domain.LoginResponseData{
 			UserId: resp.Payload.CustomerId,
 			User:   resp.Payload.User,
+			Name:   resp.Payload.Name,
 		},
 	}
 
