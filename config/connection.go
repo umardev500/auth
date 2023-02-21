@@ -16,7 +16,7 @@ func NewConn() *Connection {
 }
 
 func (c *Connection) getConn(target string) (conn *grpc.ClientConn) {
-	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithNoProxy())
 	if err != nil {
 		log.Fatal(err)
 	}
