@@ -50,7 +50,7 @@ func (a *adminDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, messag
 	if token != nil {
 		ctx.Cookie(&fiber.Cookie{
 			Path:     "/",
-			Name:     "token",
+			Name:     "membership-token",
 			Value:    tokenValue,
 			HTTPOnly: true,
 			Expires:  time.Now().Add(time.Duration(expired) * time.Second),
