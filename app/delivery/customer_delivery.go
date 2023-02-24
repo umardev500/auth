@@ -27,6 +27,7 @@ func NewCustomerDeliery(router fiber.Router, storage fiber.Storage, usecase doma
 	router.Post("/login", limiter, handler.Login)
 	router.Get("/auth", middleware.JwtMiddleware(), handler.Auth)
 	router.Post("/auth", middleware.JwtMiddleware(), handler.Auth)
+	router.Put("/auth", middleware.JwtMiddleware(), handler.Auth)
 }
 
 func (c *customerDelivery) sendLoginResponse(ctx *fiber.Ctx, statusCode int, message string, token *string) error {
